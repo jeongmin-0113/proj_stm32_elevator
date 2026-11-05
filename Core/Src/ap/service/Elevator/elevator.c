@@ -28,10 +28,10 @@ stepMotor_pin_t stepMotor1Pins[4] = { { GPIOC, GPIO_PIN_10 }, // orange
 		{ GPIOD, GPIO_PIN_2 }  // blue
 };
 
-stepMotor_pin_t stepMotor2Pins[4] = { { GPIOC, GPIO_PIN_10 }, // orange
-		{ GPIOC, GPIO_PIN_11 }, // yellow
-		{ GPIOC, GPIO_PIN_12 }, // pink
-		{ GPIOD, GPIO_PIN_2 }  // blue
+stepMotor_pin_t stepMotor2Pins[4] = { { GPIOC, GPIO_PIN_7 }, // orange
+		{ GPIOB, GPIO_PIN_6 }, // yellow
+		{ GPIOA, GPIO_PIN_7 }, // pink
+		{ GPIOA, GPIO_PIN_6 }  // blue
 };
 
 stepMotor_t motor1 = { stepMotor1Pins, 0 };
