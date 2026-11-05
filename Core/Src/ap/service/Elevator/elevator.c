@@ -34,7 +34,7 @@ stepMotor_t motor2 = { stepMotor2Pins, 0 };
 
 typedef struct {
 	stepMotor_t *motor;
-	uint8_t curFloor;
+	volatile uint8_t curFloor;
 	uint8_t targetFloor;
 	uint8_t stopFlag;
 } elevator_t;
@@ -47,7 +47,7 @@ void elevator_init() {
 	button_init(&btn_floor_3, BTN_3_GPIO, BTN_3_PIN);
 
 	elevators[0].motor = &motor1;
-	elevators[0].curFloor = 2;
+	elevators[0].curFloor = 1;
 	elevators[0].targetFloor = 1;
 	elevators[0].stopFlag = 1;
 
@@ -96,14 +96,25 @@ void elevator_buttonQueue() {
 void elevator_task() {
 	elevator_buttonQueue();
 
-	for (int i = 0; i < 2; i++) {
+//	for (int i = 0; i < 2; i++) {
+//
+//		if (elevators[i].curFloor < elevators[i].targetFloor) {
+//			elevator_up(i);
+//		} else if (elevators[i].curFloor > elevators[i].targetFloor) {
+//			elevator_down(i);
+//		} else {
+//
+//		}
+//	}
 
-		if (elevators[i].curFloor < elevators[i].targetFloor) {
-			elevator_up(i);
-		} else if (elevators[i].curFloor > elevators[i].targetFloor) {
-			elevator_down(i);
-		} else {
+//	for (int i = 0; i < 2; i++) {
 
-		}
-	}
+			if (elevators[0].curFloor < elevators[0].targetFloor) {
+				elevator_up(0);
+			} else if (elevators[0].curFloor > elevators[0].targetFloor) {
+				elevator_down(0);
+			} else {
+
+			}
+//		}
 }

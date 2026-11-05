@@ -9,7 +9,7 @@
 #include "service/sound/sound.h"
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if (GPIO_Pin == GPIO_PIN_8) {
+	if (GPIO_Pin == GPIO_PIN_9) {
 		// floor 3
 		elevator_setCurFloor(0, 3);
 		sound_button();
@@ -26,6 +26,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 void ap_main(void) {
 	elevator_init();
+	sound_init();
 
 	while (1) {
 		elevator_task();

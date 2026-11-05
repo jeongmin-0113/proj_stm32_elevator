@@ -5,6 +5,7 @@
  *      Author: kccistc
  */
 #include "sound.h"
+#include "../../../common/delay/delay.h"
 
 #define C4   262
 #define CS4  277
@@ -41,9 +42,11 @@ void sound_boot() {
 
 void sound_button() {
 	buzzer_on(G4 * 2 * 2 * 2);
-	HAL_Delay(40);
+//	HAL_Delay(40);
+	delay_ms(40);
 	buzzer_on(C4 * 2 * 2);
-	HAL_Delay(60);
+//	HAL_Delay(60);
+	delay_ms(60);
 	buzzer_off();
 }
 
