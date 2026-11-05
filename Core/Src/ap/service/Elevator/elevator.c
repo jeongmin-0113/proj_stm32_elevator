@@ -57,6 +57,10 @@ void elevator_init() {
 	elevators[1].stopFlag = 1;
 }
 
+void elevator_setCurFloor(uint8_t idx, uint8_t floor) {
+	elevators[idx].curFloor = floor;
+}
+
 void elevator_up(uint8_t idx) {
 	static uint32_t prevTime = 0;
 	if (HAL_GetTick() - prevTime >= 2) {

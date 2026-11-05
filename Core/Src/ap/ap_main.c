@@ -7,6 +7,18 @@
 #include "ap_main.h"
 #include "service/Elevator/elevator.h"
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if (GPIO_Pin == GPIO_PIN_8) {
+		// floor 3
+		elevator_setCurFloor(0, 3);
+	} else if (GPIO_Pin == GPIO_PIN_6) {
+		// floor 2
+		elevator_setCurFloor(0, 2);
+	} else if (GPIO_Pin == GPIO_PIN_5) {
+		// floor 1
+		elevator_setCurFloor(0, 1);
+	}
+}
 
 void ap_main(void) {
 	elevator_init();
