@@ -1,0 +1,26 @@
+# 빌드 결과물
+/Debug/
+/Release/
+*.o
+*.d
+*.su
+*.cyclo
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+
+# IDE 개인 설정
+/.settings/
+.metadata/
+.vscode/
+
+# CubeMX 백업/임시 파일
+*.bak
+.mxproject
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
