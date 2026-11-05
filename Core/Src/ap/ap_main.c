@@ -9,14 +9,23 @@
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == GPIO_PIN_9) {
-		// floor 3
+		// floor 3 - elevator1
 		elevator_setCurFloor(0, 3);
 	} else if (GPIO_Pin == GPIO_PIN_6) {
-		// floor 2
+		// floor 2 - elevator1
 		elevator_setCurFloor(0, 2);
 	} else if (GPIO_Pin == GPIO_PIN_5) {
-		// floor 1
+		// floor 1 - elevator1
 		elevator_setCurFloor(0, 1);
+	} else if (GPIO_Pin == GPIO_PIN_4) {
+		// floor 3 - elevator2
+		elevator_setCurFloor(1, 3);
+	} else if (GPIO_Pin == GPIO_PIN_10) {
+		// floor 2 - elevator2
+		elevator_setCurFloor(1, 2);
+	} else if (GPIO_Pin == GPIO_PIN_8) {
+		// floor 1 - elevator2
+		elevator_setCurFloor(1, 1);
 	}
 }
 

@@ -53,13 +53,11 @@ void elevator_init() {
 	elevators[0].curFloor = 1;
 	elevators[0].reqMask = 0;
 	elevators[0].dir = DIR_IDLE;
-	elevators[0].dir = DIR_IDLE;
 	elevators[0].lastStepTick = 0;
 
 	elevators[1].motor = &motor2;
 	elevators[1].curFloor = 1;
 	elevators[1].reqMask = 0;
-	elevators[1].dir = DIR_IDLE;
 	elevators[1].dir = DIR_IDLE;
 	elevators[1].lastStepTick = 0;
 
