@@ -27,5 +27,7 @@ typedef struct {
 void elevator_init();
 void elevator_task();
 void elevator_setCurFloor(uint8_t idx, uint8_t floor);
+void elevator_select(uint8_t floor);
+void elevator_getState(uint8_t *state);
 
 #endif /* SRC_AP_ELEVATOR_ELEVATOR_H_ */

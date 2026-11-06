@@ -233,13 +233,24 @@ void elevator_task() {
 		// 이동
 		if (elevators[i].dir != DIR_IDLE
 				&& HAL_GetTick() - elevators[i].lastStepTick >= 2) {
-			StepMotor_stepPhase(elevators[i].motor,
-					elevators[i].dir == DIR_UP ?
-							STEPMOTOR_DIR_CW : STEPMOTOR_DIR_CCW);
+			if (elevators[i].dir == DIR_UP) {
+				elevator_up(i);
+			} else {
+				elevator_down(i);
+			}
 			elevators[i].lastStepTick = HAL_GetTick();
 		}
 
 	}
 
 	elevator_display();
+}
+
+void elevator_getState(uint8_t *state) {
+	state[0] = elevators[0].curFloor;
+	state[1] = (uint8_t) (elevators[0].dir);
+	state[2] = elevators[0].reqMask;
+	state[3] = elevators[1].curFloor;
+	state[4] = (uint8_t) (elevators[1].dir);
+	state[5] = elevators[1].reqMask;
 }
