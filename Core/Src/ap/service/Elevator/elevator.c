@@ -52,12 +52,14 @@ void elevator_init() {
 	elevators[0].motor = &motor1;
 	elevators[0].curFloor = 1;
 	elevators[0].reqMask = 0;
+	elevators[0].forcedMask = 0;
 	elevators[0].dir = DIR_IDLE;
 	elevators[0].lastStepTick = 0;
 
 	elevators[1].motor = &motor2;
 	elevators[1].curFloor = 1;
 	elevators[1].reqMask = 0;
+	elevators[1].forcedMask = 0;
 	elevators[1].dir = DIR_IDLE;
 	elevators[1].lastStepTick = 0;
 
@@ -71,7 +73,7 @@ void elevator_init() {
 
 void elevator_setCurFloor(uint8_t idx, uint8_t floor) {
 	elevators[idx].curFloor = floor;
-	if ((elevators[idx].reqMask) & (1 << floor)) {
+	if ((elevators[idx].reqMask | elevators[idx].forcedMask) & (1 << floor)) {
 		elevators[idx].arrivedEvt = 1;
 	}
 }
@@ -104,28 +106,51 @@ uint8_t elevator_calcCost(elevator_t *e, uint8_t floor) {
 }
 
 void elevator_cancel(elevator_t *e, uint8_t floor) {
+	if (e->arrivedEvt)
+		return;
+
 	e->reqMask &= ~(1 << floor);
 
-	if (e->dir == DIR_IDLE) return;
-	uint8_t above = e->reqMask >> (e->curFloor +1);
+	if (e->dir == DIR_IDLE)
+		return;
+	uint8_t above = e->reqMask >> (e->curFloor + 1);
 	uint8_t below = e->reqMask & ((1 << e->curFloor) - 1);
 
-	if (e->dir == DIR_UP && !above) e->reqMask |= 1 << (e->curFloor + 1);
-	if (e->dir == DIR_DOWN && !below) e->reqMask |= 1 << (e->curFloor - 1);
+	if (e->dir == DIR_UP && !above && (e->curFloor < 3))
+		e->forcedMask |= 1 << (e->curFloor + 1);
+	if (e->dir == DIR_DOWN && !below && (e->curFloor > 1))
+		e->forcedMask |= 1 << (e->curFloor - 1);
 }
 
 void elevator_select(uint8_t floor) {
 	uint8_t bitMask = 1 << floor;
 	uint8_t cost[2] = { 0, 0 };
 
+	// 버튼 한 번 더 눌림 -> 호출 취소
 	for (int i = 0; i < 2; i++) {
 		if (((elevators[i].reqMask) & bitMask)) {
-			elevator_cancel(elevators[i], floor);
+			elevator_cancel(&elevators[i], floor);
 			return;
 		}
-		if (elevators[i].dir == DIR_IDLE
-						&& elevators[i].curFloor == floor)
+	}
+
+	// 취소된 후 대체 배정된 층에 호출 -> 대체 배정에서 호출로 변경
+	for (int i = 0; i < 2; i++) {
+		if (elevators[i].forcedMask & bitMask) {
+			elevators[i].reqMask |= bitMask;
+			elevators[i].forcedMask = 0;
 			return;
+		}
+	}
+
+	// 이미 그 층에 서있는 엘베가 존재 -> 배정하지 않음
+	for (int i = 0; i < 2; i++) {
+		if (elevators[i].dir == DIR_IDLE && elevators[i].curFloor == floor)
+			return;
+	}
+
+	//
+	for (int i = 0; i < 2; i++) {
 		cost[i] = elevator_calcCost(&elevators[i], floor);
 	}
 
@@ -135,7 +160,6 @@ void elevator_select(uint8_t floor) {
 		elevators[0].reqMask |= bitMask;
 	}
 }
-
 
 void elevator_buttonTask() {
 	if (button_getState(&btn_floor_1) == ACT_PUSH) {
@@ -175,13 +199,22 @@ void elevator_task() {
 		if (elevators[i].arrivedEvt) {
 			elevators[i].arrivedEvt = 0;
 			elevators[i].reqMask &= ~(1 << elevators[i].curFloor);
+			elevators[i].forcedMask &= ~(1 << elevators[i].curFloor);
 			sound_button();
 		}
 
 		// 방향 결정
-		uint8_t above = elevators[i].reqMask >> (elevators[i].curFloor + 1);
-		uint8_t below = elevators[i].reqMask
-				& ((1 << elevators[i].curFloor) - 1);
+		uint8_t mask = elevators[i].reqMask | elevators[i].forcedMask;
+		uint8_t above = mask >> (elevators[i].curFloor + 1);
+		uint8_t below = mask & ((1 << elevators[i].curFloor) - 1);
+
+		// 대체 정차 취소
+		if (elevators[i].dir == DIR_UP
+				&& (elevators[i].reqMask >> (elevators[i].curFloor + 1)))
+			elevators[i].forcedMask = 0;
+		if (elevators[i].dir == DIR_DOWN
+				&& (elevators[i].reqMask & ((1 << elevators[i].curFloor) - 1)))
+			elevators[i].forcedMask = 0;
 
 		// up 중인데 위에 없음 -> 정지
 		if (elevators[i].dir == DIR_UP && !above)

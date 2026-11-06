@@ -19,6 +19,7 @@ typedef struct {
     volatile uint8_t curFloor;    // 마지막으로 통과한 센서 층
     volatile uint8_t arrivedEvt;  // ISR에서 도착시 한번만 1 / 도착 x면 0
     uint8_t  reqMask;             // bit1=1F, bit2=2F, bit3=3F
+    uint8_t  forcedMask;
     dir_t    dir;
     uint32_t lastStepTick;
 } elevator_t;
