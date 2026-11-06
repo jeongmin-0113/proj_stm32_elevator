@@ -8,6 +8,7 @@
 #include "../../../driver/button/button.h"
 #include "../sound/sound.h"
 #include "../../../driver/lcd/lcd.h"
+#include "../../../driver/led/led.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -21,6 +22,8 @@
 extern I2C_HandleTypeDef hi2c1;
 
 button_t btn_floor_1, btn_floor_2, btn_floor_3;
+led_t ledFloor[4];   // index 1~3 = floor (0 unused)
+
 
 stepMotor_pin_t stepMotor1Pins[4] = { { GPIOC, GPIO_PIN_10 }, // orange
 		{ GPIOC, GPIO_PIN_11 }, // yellow
@@ -44,6 +47,10 @@ void elevator_init() {
 	button_init(&btn_floor_1, BTN_1_GPIO, BTN_1_PIN);
 	button_init(&btn_floor_2, BTN_2_GPIO, BTN_2_PIN);
 	button_init(&btn_floor_3, BTN_3_GPIO, BTN_3_PIN);
+
+	led_init(&ledFloor[1], GPIOB, GPIO_PIN_13);   // 1F
+	led_init(&ledFloor[2], GPIOB, GPIO_PIN_14);   // 2F
+	led_init(&ledFloor[3], GPIOB, GPIO_PIN_15);   // 3F
 
 	Lcd_init(&hi2c1);
 
@@ -69,6 +76,16 @@ void elevator_init() {
 
 	sprintf(prevBuf, "STOP 1F  STOP 1F");
 	Lcd_writeStringXY(1, 0, prevBuf);
+}
+
+void elevator_ledTask() {
+	// hall calls of both elevators (forcedMask excluded)
+	uint8_t calls = elevators[0].reqMask | elevators[1].reqMask;
+
+	for (int f = 1; f <= 3; f++) {
+		if (calls & (1 << f)) led_on(&ledFloor[f]);
+		else                  led_off(&ledFloor[f]);
+	}
 }
 
 void elevator_setCurFloor(uint8_t idx, uint8_t floor) {
@@ -242,4 +259,5 @@ void elevator_task() {
 	}
 
 	elevator_display();
+	elevator_ledTask();   // update LEDs every loop
 }
