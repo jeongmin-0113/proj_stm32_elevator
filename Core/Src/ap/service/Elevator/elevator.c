@@ -103,14 +103,28 @@ uint8_t elevator_calcCost(elevator_t *e, uint8_t floor) {
 	return dist + 3;
 }
 
+void elevator_cancel(elevator_t *e, uint8_t floor) {
+	e->reqMask &= ~(1 << floor);
+
+	if (e->dir == DIR_IDLE) return;
+	uint8_t above = e->reqMask >> (e->curFloor +1);
+	uint8_t below = e->reqMask & ((1 << e->curFloor) - 1);
+
+	if (e->dir == DIR_UP && !above) e->reqMask |= 1 << (e->curFloor + 1);
+	if (e->dir == DIR_DOWN && !below) e->reqMask |= 1 << (e->curFloor - 1);
+}
+
 void elevator_select(uint8_t floor) {
 	uint8_t bitMask = 1 << floor;
 	uint8_t cost[2] = { 0, 0 };
 
 	for (int i = 0; i < 2; i++) {
-		if (((elevators[i].reqMask) & bitMask)
-				|| (elevators[i].dir == DIR_IDLE
-						&& elevators[i].curFloor == floor))
+		if (((elevators[i].reqMask) & bitMask)) {
+			elevator_cancel(elevators[i], floor);
+			return;
+		}
+		if (elevators[i].dir == DIR_IDLE
+						&& elevators[i].curFloor == floor)
 			return;
 		cost[i] = elevator_calcCost(&elevators[i], floor);
 	}
@@ -121,6 +135,7 @@ void elevator_select(uint8_t floor) {
 		elevators[0].reqMask |= bitMask;
 	}
 }
+
 
 void elevator_buttonTask() {
 	if (button_getState(&btn_floor_1) == ACT_PUSH) {
