@@ -6,9 +6,7 @@ STM32F411RE(NUCLEO-F411RE)로 만든 **3층 2대 엘리베이터 제어 시스�
 
 ## 동작 영상
 
-<video src="docs/demo.mp4" controls width="600"></video>
-
-> 영상이 재생되지 않으면 [docs/demo.mp4](docs/demo.mp4)를 열어 보세요.
+https://github.com/user-attachments/assets/9caccf39-1486-453f-8862-f22152f4ac2f
 
 ## 주요 기능
 
@@ -62,8 +60,6 @@ proj_stm32_elevator/
 │       │   └── uart_protocol/    # 패킷 송수신, 파서
 │       └── common/delay/         # 딜레이 유틸
 ├── Drivers/                      # STM32 HAL / CMSIS
-├── docs/
-│   └── demo.mp4                  # 동작 영상
 ├── pc_app/
 │   ├── elevator_control.py       # PC 제어 GUI
 │   └── requirements.txt
